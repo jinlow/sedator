@@ -1,6 +1,6 @@
-from .editor import Editor
+from .baseapp import TextApplication
 
 
 def runApplication():
-    editor = Editor()
+    editor = TextApplication()
     editor.runApplication()

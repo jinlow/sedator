@@ -12,13 +12,11 @@ class TextApplication:
     Allows for multiple Editor tabs under one notebook.
     """
 
-    def __init__(self, root: tk.Tk = None):
+    def __init__(self, root: tk.Tk = None, base_tab=True):
         if root is None:
             self.root = tk.Tk()
         else:
             self.root = root
-
-        self.filename = None
 
         self.style = ttk.Style()
         self.style.theme_use("clam")
@@ -36,7 +34,8 @@ class TextApplication:
         self.file_list: List[EditorTab] = []
 
         # Create base editor tab
-        # self.notebook.add(EditorTab(self.root), text="Untitled")
+        if base_tab:
+            self.new_file()
 
         # Create menu
         self.create_menu()
@@ -46,25 +45,27 @@ class TextApplication:
         self.menubar = tk.Menu(self.root)
         self.filemenu = tk.Menu(self.menubar)
         self.filemenu.add_command(label="New File", command=self.new_file)
-        self.filemenu.add_command(label="Close File", command=self.close_file)
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label="Open File", command=self.open_file)
+        self.filemenu.add_separator()
         self.filemenu.add_command(label="Save As...", command=self.save_as)
         self.filemenu.add_command(label="Save File", command=self.save_file)
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label="Close File", command=self.close_file)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
         self.root.config(menu=self.menubar)
 
-    def new_file(self):
-        self.filename = "untitled"
-        new_file = EditorTab(self.root)
-        new_file.tab_name = "untitled"
-        self.file_list.append(new_file)
-        new_file.pack()
-        self.notebook.add(new_file, text=self.filename)
-        self.notebook.select(new_file)
+    def new_file(self, name="untitled"):
+        nfile = self._add_tab(name=name)
+        # new_file.pack()
+        self.notebook.add(nfile, text=nfile.tab_name)
+        self.notebook.select(nfile)
 
-    def close_file(self):
-        idx = self.notebook.index("current")
-        self.notebook.forget(self.notebook.select())
-        del self.file_list[idx]
+    def open_file(self):
+        f = filedialog.askopenfile(mode="r")
+        t = f.read()
+        self.new_file(name=f.name)
+        self.get_tab().insert(0.0, t)
 
     def save_as(self):
         f = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
@@ -84,14 +85,25 @@ class TextApplication:
         f.write(t)
         f.close()
 
+    def close_file(self):
+        idx = self.notebook.index("current")
+        self.notebook.forget(self.notebook.select())
+        del self.file_list[idx]
+
     def get_tab(self):
         # return self.notebook.tab(self.notebook.select())
         idx = self.notebook.index("current")
         return self.file_list[idx]
 
-    def set_tab_name(self, name):
-        idx = self.notebook.index("current")
-        self.file_list[idx].tab_name = name
+    # def set_tab_name(self, name):
+    #     idx = self.notebook.index("current")
+    #     self.file_list[idx].tab_name = name
+
+    def _add_tab(self, name="untitled"):
+        nfile = EditorTab(self.root)
+        nfile.tab_name = name
+        self.file_list.append(nfile)
+        return nfile
 
     def runApplication(self):
         self.root.mainloop()
