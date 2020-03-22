@@ -1,14 +1,20 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter.scrolledtext import ScrolledText
 
 
 class Editor:
-    def __init__(self):
+    def __init__(self, root: tk.Tk = None):
+        if root is None:
+            self.root = tk.Tk()
+        else:
+            self.root = root
+
         self.filename = None
-        self.root = tk.Tk()
         self.prepRoot()
 
-        self.text = tk.Text(self.root, width=200, height=200)
+        # Create Scrolled text
+        self.text = ScrolledText(self.root, width=200, height=200)
         self.text.pack()
         self.createFilemenu()
 
