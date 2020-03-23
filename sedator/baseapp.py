@@ -4,6 +4,7 @@ from tkinter.scrolledtext import ScrolledText
 from tkinter import filedialog
 from tkinter.messagebox import showerror
 from .editor import EditorTab
+from .keybindings import KeyBinder
 from typing import List
 
 
@@ -17,6 +18,8 @@ class TextApplication:
             self.root = tk.Tk()
         else:
             self.root = root
+
+        self.keybinder = KeyBinder()
 
         self.style = ttk.Style()
         self.style.theme_use("clam")
@@ -38,36 +41,66 @@ class TextApplication:
             self.new_file()
 
         # Create menu
+        self.menubar = tk.Menu(self.root)
         self.create_menu()
         self.notebook.pack()
 
     def create_menu(self):
-        self.menubar = tk.Menu(self.root)
         self.filemenu = tk.Menu(self.menubar)
-        self.filemenu.add_command(label="New File", command=self.new_file)
+        self.keybinder.base_control_bind(
+            self.root,
+            func=self.new_file,
+            add_keys=["n"],
+            filemenu=self.filemenu,
+            label="New File",
+        )
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Open File", command=self.open_file)
+        self.keybinder.base_control_bind(
+            self.root,
+            func=self.open_file,
+            add_keys=["o"],
+            filemenu=self.filemenu,
+            label="Open File",
+        )
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Save As...", command=self.save_as)
-        self.filemenu.add_command(label="Save File", command=self.save_file)
+        self.keybinder.base_control_bind(
+            self.root,
+            func=self.save_as,
+            add_keys=["Shift", "s"],
+            filemenu=self.filemenu,
+            label="Save As...",
+        )
+        self.keybinder.base_control_bind(
+            self.root,
+            func=self.save_file,
+            add_keys=["s"],
+            filemenu=self.filemenu,
+            label="Save File",
+        )
         self.filemenu.add_separator()
-        self.filemenu.add_command(label="Close File", command=self.close_file)
+        self.keybinder.base_control_bind(
+            self.root,
+            func=self.close_file,
+            add_keys=["w"],
+            filemenu=self.filemenu,
+            label="Close File",
+        )
         self.menubar.add_cascade(label="File", menu=self.filemenu)
         self.root.config(menu=self.menubar)
 
-    def new_file(self, name="untitled"):
+    def new_file(self, event=None, name="untitled"):
         nfile = self._add_tab(name=name)
-        # new_file.pack()
         self.notebook.add(nfile, text=nfile.tab_name)
         self.notebook.select(nfile)
 
-    def open_file(self):
+    def open_file(self, event=None):
         f = filedialog.askopenfile(mode="r")
-        t = f.read()
-        self.new_file(name=f.name)
-        self.get_tab().insert(0.0, t)
+        if f is not None:
+            t = f.read()
+            self.new_file(name=f.name)
+            self.get_tab().insert(0.0, t)
 
-    def save_as(self):
+    def save_as(self, event=None):
         f = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
         self.get_tab().tab_name = f.name
         tab = self.get_tab()
@@ -77,7 +110,7 @@ class TextApplication:
         except:
             showerror("Error", "Unable to save file")
 
-    def save_file(self):
+    def save_file(self, event=None):
         tab = self.get_tab()
         t = tab.get(0.0, tk.END)
         fname = tab.tab_name
@@ -85,19 +118,14 @@ class TextApplication:
         f.write(t)
         f.close()
 
-    def close_file(self):
+    def close_file(self, event=None):
         idx = self.notebook.index("current")
         self.notebook.forget(self.notebook.select())
         del self.file_list[idx]
 
     def get_tab(self):
-        # return self.notebook.tab(self.notebook.select())
         idx = self.notebook.index("current")
         return self.file_list[idx]
-
-    # def set_tab_name(self, name):
-    #     idx = self.notebook.index("current")
-    #     self.file_list[idx].tab_name = name
 
     def _add_tab(self, name="untitled"):
         nfile = EditorTab(self.root)
