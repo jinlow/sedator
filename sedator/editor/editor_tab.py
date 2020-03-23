@@ -12,8 +12,8 @@ class EditorTab(ScrolledText):
             pady=10,
             bd=0,
             relief=tk.FLAT,
-            bg="#272822",
-            fg="#F8F8F2",
+            bg="#270217",
+            fg="#FFFDE7",
             insertbackground="#add8e6",
             *args,
             **kwargs
