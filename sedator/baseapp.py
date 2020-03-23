@@ -21,8 +21,24 @@ class TextApplication:
 
         self.keybinder = KeyBinder()
 
+        _bg_color0 = "#272822"
+        _bg_color1 = "#75715E"
+        _fg_color0 = "#63604f"
+        _fg_color1 = "#F8F8F2"
+
         self.style = ttk.Style()
         self.style.theme_use("clam")
+        self.style.configure(".", background=_bg_color0)
+        self.style.configure(".", foreground=_fg_color0)
+        self.style.map(
+            ".", background=[("selected", "orange"), ("active", "orange")]
+        )
+        self.style.configure("TNotebook.Tab", background=_fg_color0)
+        self.style.configure("TNotebook.Tab", foreground=_fg_color1)
+        self.style.map(
+            "TNotebook.Tab",
+            background=[("selected", _bg_color1), ("active", _bg_color1)],
+        )
 
         self.root.title("Sedator: A simple editor")
         self.root.columnconfigure(0, weight=1)
