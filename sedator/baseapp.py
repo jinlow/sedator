@@ -1,11 +1,11 @@
+import ntpath
 import tkinter as tk
 from tkinter import ttk
-from tkinter.scrolledtext import ScrolledText
 from tkinter import filedialog
 from tkinter.messagebox import showerror
 from .editor import EditorTab
 from .keybindings import KeyBinder
-from typing import List
+from typing import List, Any, Optional
 
 
 class TextApplication:
@@ -13,7 +13,7 @@ class TextApplication:
     Allows for multiple Editor tabs under one notebook.
     """
 
-    def __init__(self, root: tk.Tk = None, base_tab=True):
+    def __init__(self, root: tk.Tk = None, base_tab: bool = True):
         if root is None:
             self.root = tk.Tk()
         else:
@@ -88,37 +88,43 @@ class TextApplication:
         self.menubar.add_cascade(label="File", menu=self.filemenu)
         self.root.config(menu=self.menubar)
 
-    def new_file(self, event=None, name="untitled"):
+    def new_file(self, event: Optional[Any] = None, name: str = "untitled"):
         nfile = self._add_tab(name=name)
         self.notebook.add(nfile, text=nfile.tab_name)
         self.notebook.select(nfile)
 
-    def open_file(self, event=None):
+    def open_file(self, event: Optional[Any] = None):
         f = filedialog.askopenfile(mode="r")
         if f is not None:
             t = f.read()
             self.new_file(name=f.name)
+            self.get_tab().tab_saved = True
             self.get_tab().insert(0.0, t)
 
-    def save_as(self, event=None):
+    def save_as(self, event: Optional[Any] = None):
         f = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
         self.get_tab().tab_name = f.name
         tab = self.get_tab()
+        self.notebook.tab(tab, text=tab.tab_name)
         t = tab.get(0.0, tk.END)
         try:
             f.write(t.rstrip())
         except:
             showerror("Error", "Unable to save file")
+        self.get_tab().tab_saved = True
 
-    def save_file(self, event=None):
+    def save_file(self, event: Optional[Any] = None):
         tab = self.get_tab()
-        t = tab.get(0.0, tk.END)
-        fname = tab.tab_name
-        f = open(fname, "w")
-        f.write(t)
-        f.close()
+        if not tab.tab_saved:
+            self.save_as()
+        else:
+            t = tab.get(0.0, tk.END)
+            fname = tab.tab_name
+            f = open(fname, "w")
+            f.write(t)
+            f.close()
 
-    def close_file(self, event=None):
+    def close_file(self, event: Optional[Any] = None):
         idx = self.notebook.index("current")
         self.notebook.forget(self.notebook.select())
         del self.file_list[idx]

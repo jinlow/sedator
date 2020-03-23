@@ -4,6 +4,10 @@ from typing import Callable, List
 
 
 class KeyBinder:
+    """
+    Class for creating keybindings and menu items.
+    """
+
     def __init__(self):
         # Check base platform type
         if sys.platform[0:3] == "win":

@@ -4,7 +4,7 @@ from tkinter.scrolledtext import ScrolledText
 
 
 class EditorTab(ScrolledText):
-    def __init__(self, root, *args, **kwargs):
+    def __init__(self, root: tk.Tk, *args, **kwargs):
         super().__init__(
             # Set defaults for ScrolledText
             root,
