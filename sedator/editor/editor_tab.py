@@ -23,13 +23,20 @@ class EditorTab(ScrolledText):
         self.tab_saved = False
         self._tab_name = None
 
-        font = Font(font="Consolas")
-        self.configure(font=font)
+        self.font = Font(font="Consolas")
+        self.configure(font=self.font)
         self.config(wrap="none")
 
-        self.highlighter = Highlighter(self, text_theme="fruity", font=font)
+        self.highlighter = Highlighter(
+            self, text_theme="fruity", font=self.font
+        )
+        self.bind("<<Paste>>", lambda x: print("something"))
         # self.linenumbers = tk.Text(self, width=1, state="disabled")
         # self.linenumbers.pack(side=tk.LEFT, fill=tk.BOTH)
+
+        # Bind Keys
+        self.bind("<Tab>", self.tab_key)
+        self.bind("<KeyRelease>", self.highlighter.edit_highlighter)
 
     @property
     def tab_name(self):
@@ -39,3 +46,10 @@ class EditorTab(ScrolledText):
     def tab_name(self, value):
         value = ntpath.basename(value)
         self._tab_name = value
+
+    def tab_key(self, event):
+        """
+        Set tabs to be 4 spaces.
+        """
+        self.insert(tk.INSERT, " " * 4)
+        return "break"

@@ -22,9 +22,6 @@ class Highlighter:
         # Prep style tags
         self.prep_style_tags()
 
-        # Bind events
-        self.text.bind("<KeyRelease>", self.edit_highlighter)
-
     def prep_style_tags(self):
         """
         Prepare all tags to use for highlighting
@@ -46,6 +43,19 @@ class Highlighter:
     def edit_highlighter(self, event=None):
         """
         Syntax highlighting while editing.
+        """
+        self.text.mark_set("range_start", tk.INSERT + " linestart")
+        data = self.text.get("range_start", "range_start lineend")
+        for fmt, token in lex(data, PythonLexer()):
+            self.text.mark_set("range_end", f"range_start+{len(token)}c")
+            for tag in self.fmt_list:
+                self.text.tag_remove(tag, "range_start", "range_end")
+            self.text.tag_add(str(fmt), "range_start", "range_end")
+            self.text.mark_set("range_start", "range_end")
+
+    def paste_highlighter(self, event=None):
+        """
+        Highlighter to use if text is pasted in.
         """
         self.text.mark_set("range_start", tk.INSERT + " linestart")
         data = self.text.get("range_start", "range_start lineend")
