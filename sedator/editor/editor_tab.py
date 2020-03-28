@@ -1,5 +1,7 @@
 import ntpath
 import tkinter as tk
+from tkinter.font import Font
+from .highlighter import Highlighter
 from tkinter.scrolledtext import ScrolledText
 
 
@@ -21,9 +23,11 @@ class EditorTab(ScrolledText):
         self.tab_saved = False
         self._tab_name = None
 
+        font = Font(font="Consolas")
+        self.configure(font=font)
         self.config(wrap="none")
-        self.config(font=("Consolas", 13))
 
+        self.highlighter = Highlighter(self, text_theme="fruity", font=font)
         # self.linenumbers = tk.Text(self, width=1, state="disabled")
         # self.linenumbers.pack(side=tk.LEFT, fill=tk.BOTH)
 

@@ -115,26 +115,27 @@ class TextApplication:
             t = f.read()
             self.new_file(name=f.name)
             self.get_tab().tab_saved = True
-            self.get_tab().insert(0.0, t)
+            self.get_tab().insert("1.0", t)
 
     def save_as(self, event: Optional[Any] = None):
         f = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
-        self.get_tab().tab_name = f.name
-        tab = self.get_tab()
-        self.notebook.tab(tab, text=tab.tab_name)
-        t = tab.get(0.0, tk.END)
-        try:
-            f.write(t.rstrip())
-        except:
-            showerror("Error", "Unable to save file")
-        self.get_tab().tab_saved = True
+        if f is not None:
+            self.get_tab().tab_name = f.name
+            tab = self.get_tab()
+            self.notebook.tab(tab, text=tab.tab_name)
+            t = tab.get("1.0", tk.END)
+            try:
+                f.write(t.rstrip())
+            except:
+                showerror("Error", "Unable to save file")
+            self.get_tab().tab_saved = True
 
     def save_file(self, event: Optional[Any] = None):
         tab = self.get_tab()
         if not tab.tab_saved:
             self.save_as()
         else:
-            t = tab.get(0.0, tk.END)
+            t = tab.get("1.0", tk.END)
             fname = tab.tab_name
             f = open(fname, "w")
             f.write(t)
