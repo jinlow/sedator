@@ -7,7 +7,19 @@ from typing import List
 
 
 class Highlighter:
-    def __init__(self, text, text_theme: str = "monokai", font: Font = None):
+    """
+    Class for Syntax highlighting and formatting
+    
+    This class implements functionality for syntax highlighting,
+    and syntax formatting. Currently it is a class called within
+    the EditorTab constructor. This may be implemented as a different
+    way in the future as functionality is built out. It may be an
+    easier design to have it as a class EditorTab inherits from.
+    """
+
+    def __init__(
+        self, text: tk.Text, text_theme: str = "monokai", font: Font = None
+    ):
         self.text = text
         self.style = get_style_by_name(text_theme)
         self.fmt_list: List[str] = []
@@ -53,15 +65,16 @@ class Highlighter:
             self.text.tag_add(str(fmt), "range_start", "range_end")
             self.text.mark_set("range_start", "range_end")
 
-    def paste_highlighter(self, event=None):
+    def paste_highlighter(self, index1, index2, event=None):
         """
         Highlighter to use if text is pasted in.
+            This highlighter is more efficient but does not have
+            the same real time checks needed for overwriting the tags
+            as are present in the edit_highlighter function.
         """
-        self.text.mark_set("range_start", tk.INSERT + " linestart")
-        data = self.text.get("range_start", "range_start lineend")
+        self.text.mark_set("range_start", index1)
+        data = self.text.get("range_start", index2)
         for fmt, token in lex(data, PythonLexer()):
             self.text.mark_set("range_end", f"range_start+{len(token)}c")
-            for tag in self.fmt_list:
-                self.text.tag_remove(tag, "range_start", "range_end")
             self.text.tag_add(str(fmt), "range_start", "range_end")
             self.text.mark_set("range_start", "range_end")

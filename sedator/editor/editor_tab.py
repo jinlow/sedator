@@ -18,7 +18,7 @@ class EditorTab(ScrolledText):
             insertbackground="#add8e6",
             highlightthickness=0,
             *args,
-            **kwargs
+            **kwargs,
         )
         self.tab_saved = False
         self._tab_name = None
@@ -30,13 +30,13 @@ class EditorTab(ScrolledText):
         self.highlighter = Highlighter(
             self, text_theme="fruity", font=self.font
         )
-        self.bind("<<Paste>>", lambda x: print("something"))
         # self.linenumbers = tk.Text(self, width=1, state="disabled")
         # self.linenumbers.pack(side=tk.LEFT, fill=tk.BOTH)
 
         # Bind Keys
         self.bind("<Tab>", self.tab_key)
         self.bind("<KeyRelease>", self.highlighter.edit_highlighter)
+        self.bind("<<Paste>>", self.paste_w_info)
 
     @property
     def tab_name(self):
@@ -52,4 +52,26 @@ class EditorTab(ScrolledText):
         Set tabs to be 4 spaces.
         """
         self.insert(tk.INSERT, " " * 4)
+        return "break"
+
+    def paste_w_info(self, event=None):
+        """
+        Paste from clipboard
+
+        A function to overwrite the standard Cmd+V paste functionality
+        that provides more information and can utalize the paste_highlighter
+        function.
+        """
+        data = self.clipboard_get(type="STRING")
+        sidx = self.index(tk.INSERT)
+
+        try:
+            self.delete("sel.first", "sel.last")
+        except tk.TclError:
+            pass
+
+        # insert the clipboard contents
+        self.insert(tk.INSERT, data)
+
+        self.highlighter.paste_highlighter(sidx, tk.INSERT)
         return "break"
