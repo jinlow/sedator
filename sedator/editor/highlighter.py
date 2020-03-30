@@ -52,16 +52,30 @@ class Highlighter:
                 self.text.tag_config(str(fmt), foreground=color)
             self.fmt_list.append(str(fmt))
 
-    def edit_highlighter(self, event=None):
+    def block_highlighter(self, data, index1):
         """
-        Syntax highlighting while editing.
+        Syntax highlighting a block of text
         """
-        self.text.mark_set("range_start", tk.INSERT + " linestart")
-        data = self.text.get("range_start", "range_start lineend")
+        self.text.mark_set("range_start", index1)
         for fmt, token in lex(data, PythonLexer()):
             self.text.mark_set("range_end", f"range_start+{len(token)}c")
             for tag in self.fmt_list:
                 self.text.tag_remove(tag, "range_start", "range_end")
+            self.text.tag_add(str(fmt), "range_start", "range_end")
+            self.text.mark_set("range_start", "range_end")
+
+    def edit_highlighter(self, event=None):
+        """
+        Syntax highlighting while editing.
+        This will edit a single line. This does not deal with
+        triple quotes.
+        """
+        self.text.mark_set("range_start", tk.INSERT + " linestart")
+        data = self.text.get("range_start", "range_start lineend")
+        for tag in self.fmt_list:
+            self.text.tag_remove(tag, "range_start", "range_start lineend")
+        for fmt, token in lex(data, PythonLexer()):
+            self.text.mark_set("range_end", f"range_start+{len(token)}c")
             self.text.tag_add(str(fmt), "range_start", "range_end")
             self.text.mark_set("range_start", "range_end")
 

@@ -14,7 +14,7 @@ class EditorTab(ScrolledText):
             bd=0,
             relief=tk.FLAT,
             bg="#272822",
-            fg="#FFFDE7",
+            # fg="#FFFDE7",
             insertbackground="#add8e6",
             highlightthickness=0,
             *args,
@@ -23,6 +23,8 @@ class EditorTab(ScrolledText):
         self.tab_saved = False
         self._tab_name = None
 
+        self.configure(undo=True, autoseparators=True, maxundo=-1)
+
         self.font = Font(font="Consolas")
         self.configure(font=self.font)
         self.config(wrap="none")
@@ -30,8 +32,6 @@ class EditorTab(ScrolledText):
         self.highlighter = Highlighter(
             self, text_theme="fruity", font=self.font
         )
-        # self.linenumbers = tk.Text(self, width=1, state="disabled")
-        # self.linenumbers.pack(side=tk.LEFT, fill=tk.BOTH)
 
         # Bind Keys
         self.bind("<Tab>", self.tab_key)

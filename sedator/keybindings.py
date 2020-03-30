@@ -45,3 +45,17 @@ class KeyBinder:
                 command=func,
                 accelerator=f"{self.ctrl}-{'-'.join(add_keys)}",
             )
+
+    def control_add_command(
+        self,
+        root: tk.Tk,
+        func: Callable,
+        add_keys: List[str],
+        filemenu: tk.Menu,
+        label: str = None,
+    ):
+        filemenu.add_command(
+            label=label,
+            command=func,
+            accelerator=f"{self.ctrl}-{'-'.join(add_keys)}",
+        )

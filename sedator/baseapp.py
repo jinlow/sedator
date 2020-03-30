@@ -13,7 +13,7 @@ class TextApplication:
     Allows for multiple Editor tabs under one notebook.
     """
 
-    def __init__(self, root: tk.Tk = None, base_tab: bool = True):
+    def __init__(self, root: Optional[tk.Tk] = None, base_tab: bool = True):
         if root is None:
             self.root = tk.Tk()
         else:
@@ -62,7 +62,9 @@ class TextApplication:
         self.notebook.pack()
 
     def create_menu(self):
+        # filemenue
         self.filemenu = tk.Menu(self.menubar)
+        self.filemenu.add_separator()
         self.keybinder.base_control_bind(
             self.root,
             func=self.new_file,
@@ -102,6 +104,47 @@ class TextApplication:
             label="Close File",
         )
         self.menubar.add_cascade(label="File", menu=self.filemenu)
+        self.root.config(menu=self.menubar)
+        # Edit Menu
+        self.editmenu = tk.Menu(self.menubar)
+        self.editmenu.add_separator()
+        self.keybinder.base_control_bind(
+            self.root,
+            func=self.undo_tab,
+            add_keys=["z"],
+            filemenu=self.editmenu,
+            label="Undo",
+        )
+        self.keybinder.base_control_bind(
+            self.root,
+            func=self.redo_tab,
+            add_keys=["Shift", "z"],
+            filemenu=self.editmenu,
+            label="Redo",
+        )
+        self.editmenu.add_separator()
+        self.keybinder.control_add_command(
+            self.root,
+            func=lambda: self.get_tab().event_generate("<<Cut>>"),
+            add_keys=["x"],
+            filemenu=self.editmenu,
+            label="Cut",
+        )
+        self.keybinder.control_add_command(
+            self.root,
+            func=lambda: self.get_tab().event_generate("<<Copy>>"),
+            add_keys=["c"],
+            filemenu=self.editmenu,
+            label="Copy",
+        )
+        self.keybinder.control_add_command(
+            self.root,
+            func=self.get_tab().paste_w_info,
+            add_keys=["v"],
+            filemenu=self.editmenu,
+            label="Paste",
+        )
+        self.menubar.add_cascade(label="Edit", menu=self.editmenu)
         self.root.config(menu=self.menubar)
 
     def new_file(self, event: Optional[Any] = None, name: str = "untitled"):
@@ -145,6 +188,18 @@ class TextApplication:
         idx = self.notebook.index("current")
         self.notebook.forget(self.notebook.select())
         del self.file_list[idx]
+
+    def undo_tab(self, event: Optional[Any] = None):
+        try:
+            self.get_tab().edit_undo()
+        except tk.TclError:
+            pass
+
+    def redo_tab(self, event: Optional[Any] = None):
+        try:
+            self.get_tab().edit_redo()
+        except tk.TclError:
+            pass
 
     def get_tab(self):
         idx = self.notebook.index("current")
