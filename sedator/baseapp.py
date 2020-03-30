@@ -162,7 +162,7 @@ class TextApplication:
             self.get_tab().highlighter.block_highlighter(t, "1.0")
 
     def save_as(self, event: Optional[Any] = None):
-        f = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
+        f = filedialog.asksaveasfile(mode="w", defaultextension=".py")
         if f is not None:
             self.get_tab().tab_name = f.name
             tab = self.get_tab()
