@@ -159,6 +159,7 @@ class TextApplication:
             self.new_file(name=f.name)
             self.get_tab().tab_saved = True
             self.get_tab().insert("1.0", t)
+            self.get_tab().highlighter.block_highlighter(t, "1.0")
 
     def save_as(self, event: Optional[Any] = None):
         f = filedialog.asksaveasfile(mode="w", defaultextension=".txt")

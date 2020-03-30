@@ -52,15 +52,16 @@ class Highlighter:
                 self.text.tag_config(str(fmt), foreground=color)
             self.fmt_list.append(str(fmt))
 
-    def block_highlighter(self, data, index1):
+    def block_highlighter(self, data, index1, remove_fmt=False):
         """
         Syntax highlighting a block of text
         """
         self.text.mark_set("range_start", index1)
+        if remove_fmt:
+            for tag in self.fmt_list:
+                self.text.tag_remove(tag, "range_start", "end")
         for fmt, token in lex(data, PythonLexer()):
             self.text.mark_set("range_end", f"range_start+{len(token)}c")
-            for tag in self.fmt_list:
-                self.text.tag_remove(tag, "range_start", "range_end")
             self.text.tag_add(str(fmt), "range_start", "range_end")
             self.text.mark_set("range_start", "range_end")
 
