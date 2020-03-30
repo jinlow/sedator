@@ -2,7 +2,7 @@
 
 A no frills simple text editor built with pure python. This is largely just for learning and getting some experience playing around with creating a GUI.
 
-![alt text](resources/example.png?raw=true)
+<img src="resources/example.png?raw=true" width="550">
 
 ## Testing it out...
 Clone this repository, the only required packages are the python standard library, and `pygments`.  
