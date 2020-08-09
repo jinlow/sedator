@@ -10,10 +10,10 @@ class KeyBinder:
 
     def __init__(self):
         # Check base platform type
-        if sys.platform[0:3] == "win":
-            self.ctrl = "Control"
-        elif sys.platform == "darwin":
+        if sys.platform == "darwin":
             self.ctrl = "Command"
+        else:
+            self.ctrl = "Control"
 
     def base_control_bind(
         self,
